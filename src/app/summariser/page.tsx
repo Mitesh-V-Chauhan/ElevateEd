@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useState, useRef, useEffect, Suspense, useCallback } from 'react';
-import { ChevronDown, Zap, Clipboard, BookOpen } from 'lucide-react';
+import { ChevronDown, Zap, Clipboard, BookOpen, AlertTriangle } from 'lucide-react';
 import { baseUrl } from '@/utils/urls';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { checkDailyQuizLimit, updateDailyQuizCount } from '@/services/firebaseFunctions/limits';
+import { checkDailyGenerationLimit, updateDailyGenerationCount, LIMITS } from '@/services/firebaseFunctions/limits';
 import { useUniversalInput } from '@/contexts/InputContext';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const SummarizerContent: React.FC = () => {
   const { user } = useAuth();
-  const { inputContent } = useUniversalInput();
+  const { inputContent, selectedLanguage } = useUniversalInput();
   useTheme();
 
   const [generatedSummary, setGeneratedSummary] = useState<string | string[] | null>(null);
@@ -22,7 +22,8 @@ const SummarizerContent: React.FC = () => {
   const [isLengthDropdownOpen, setIsLengthDropdownOpen] = useState(false);
   const [isFormatDropdownOpen, setIsFormatDropdownOpen] = useState(false);
   const [canCreateSummary, setCanCreateSummary] = useState<boolean>(true);
-  const [, setIsCheckingLimits] = useState(false);
+  const [dailyGenerationRemaining, setDailyGenerationRemaining] = useState<number>(LIMITS.DAILY_GENERATION_LIMIT);
+  const [isCheckingLimits, setIsCheckingLimits] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const summaryLengths = [{ id: 'short', name: 'Short' }, { id: 'medium', name: 'Medium' }, { id: 'long', name: 'Long' }];
@@ -32,8 +33,9 @@ const SummarizerContent: React.FC = () => {
     if (!user) return;
     setIsCheckingLimits(true);
     try {
-      const dailyLimit = await checkDailyQuizLimit(user.id);
-      setCanCreateSummary(dailyLimit.canCreate);
+      const dailyGenerationLimit = await checkDailyGenerationLimit(user.id);
+      setDailyGenerationRemaining(dailyGenerationLimit.remaining);
+      setCanCreateSummary(dailyGenerationLimit.canGenerate);
     } catch (error) {
       console.error('Error checking summary limits:', error);
       setCanCreateSummary(true);
@@ -51,10 +53,18 @@ const SummarizerContent: React.FC = () => {
       alert('Please provide at least 100 characters of content in the sidebar.');
       return;
     }
-    if (!user || !canCreateSummary) {
-      alert('Cannot generate summary. Please check your login status and daily limits.');
+    if (!user) {
+      alert('Please log in to generate summaries.');
       return;
     }
+
+    // Check daily generation limit
+    const dailyGenerationLimit = await checkDailyGenerationLimit(user.id);
+    if (!dailyGenerationLimit.canGenerate) {
+      alert(`Daily generation limit reached! You can create ${LIMITS.DAILY_GENERATION_LIMIT} items per day across all features. Try again tomorrow.`);
+      return;
+    }
+
     setIsGenerating(true);
     setGeneratedSummary(null);
     setSummaryTitle(null);
@@ -66,6 +76,7 @@ const SummarizerContent: React.FC = () => {
           text: inputContent, 
           length: summaryLength, 
           format: summaryFormat,
+          language: selectedLanguage || 'English',
           userId: user.id 
         }),
       });
@@ -76,7 +87,9 @@ const SummarizerContent: React.FC = () => {
       const data = await response.json();
       setSummaryTitle(data.title || null);
       setGeneratedSummary(data.summary);
-      await updateDailyQuizCount(user.id);
+      
+      // Update daily generation count
+      await updateDailyGenerationCount(user.id, 'summary');
       await checkUserLimits();
     } catch (error) {
       console.error('Error generating summary:', error);
@@ -102,6 +115,28 @@ const SummarizerContent: React.FC = () => {
       <div className="p-4 md:p-6 border-b border-zinc-200 dark:border-zinc-800">
         <h2 className="text-xl font-['SF-Pro-Display-Regular'] text-zinc-900 dark:text-zinc-100">AI Summarizer</h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">Configure options and generate a summary from your content.</p>
+        
+        {/* Limits Display */}
+        {!isCheckingLimits && (
+          <div className="flex justify-center items-center mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center space-x-2">
+              <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm text-blue-700 dark:text-blue-300">
+                Daily Generations: {dailyGenerationRemaining} remaining (all features)
+              </span>
+            </div>
+          </div>
+        )}
+        
+        {/* Warning for limits */}
+        {!canCreateSummary && (
+          <div className="flex items-center justify-center space-x-2 mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+            <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+            <span className="text-sm text-red-700 dark:text-red-300">
+              Daily generation limit reached. You can create {LIMITS.DAILY_GENERATION_LIMIT} items per day across all features.
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex-grow p-4 md:p-6 overflow-y-auto space-y-6">

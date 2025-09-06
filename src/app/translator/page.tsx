@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useRef, Suspense } from 'react';
-import { ChevronDown, Zap, Clipboard, Languages } from 'lucide-react';
+import React, { useState, useRef, Suspense, useEffect, useCallback } from 'react';
+import { ChevronDown, Zap, Clipboard, Languages, AlertTriangle } from 'lucide-react';
 import { baseUrl } from '@/utils/urls';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
-
 import { useUniversalInput } from '@/contexts/InputContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { checkDailyGenerationLimit, updateDailyGenerationCount, LIMITS } from '@/services/firebaseFunctions/limits';
 
 const TranslatorContent: React.FC = () => {
   const { user } = useAuth();
@@ -19,7 +19,34 @@ const TranslatorContent: React.FC = () => {
   const [targetLanguage, setTargetLanguage] = useState('spanish');
   const [customInstruction, setCustomInstruction] = useState('');
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  
+  // Limit tracking states
+  const [dailyGenerationRemaining, setDailyGenerationRemaining] = useState<number>(LIMITS.DAILY_GENERATION_LIMIT);
+  const [canCreateTranslation, setCanCreateTranslation] = useState<boolean>(true);
+  const [isCheckingLimits, setIsCheckingLimits] = useState<boolean>(false);
+  
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Check limits when component mounts and user changes
+  const checkLimits = useCallback(async () => {
+    if (!user) return;
+    
+    setIsCheckingLimits(true);
+    try {
+      const dailyGenerationLimit = await checkDailyGenerationLimit(user.id);
+      setDailyGenerationRemaining(dailyGenerationLimit.remaining);
+      setCanCreateTranslation(dailyGenerationLimit.canGenerate);
+    } catch (error) {
+      console.error('Error checking limits:', error);
+      setCanCreateTranslation(true); // Allow generation on error
+    } finally {
+      setIsCheckingLimits(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    checkLimits();
+  }, [checkLimits]);
 
   const languages = [
     { id: 'spanish', name: 'Spanish' },
@@ -70,6 +97,14 @@ const TranslatorContent: React.FC = () => {
       alert('Please log in to translate content.');
       return;
     }
+
+    // Check daily generation limit
+    const dailyGenerationLimit = await checkDailyGenerationLimit(user.id);
+    if (!dailyGenerationLimit.canGenerate) {
+      alert(`Daily generation limit reached! You can create ${LIMITS.DAILY_GENERATION_LIMIT} items per day across all features. Try again tomorrow.`);
+      return;
+    }
+
     setIsTranslating(true);
     setTranslatedContent(null);
     try {
@@ -89,6 +124,10 @@ const TranslatorContent: React.FC = () => {
       }
       const data = await response.json();
       setTranslatedContent(data.translated_text || data.translation || data.result);
+      
+      // Update daily generation count
+      await updateDailyGenerationCount(user.id, 'translation');
+      await checkLimits();
     } catch (error) {
       console.error('Error translating content:', error);
       alert(error instanceof Error ? error.message : 'An unknown error occurred.');
@@ -111,6 +150,28 @@ const TranslatorContent: React.FC = () => {
       <div className="p-4 md:p-6 border-b border-zinc-200 dark:border-zinc-800">
         <h2 className="text-xl font-['SF-Pro-Display-Regular'] text-zinc-900 dark:text-zinc-100">AI Translator</h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">Configure options and translate your content to any language.</p>
+        
+        {/* Limits Display */}
+        {!isCheckingLimits && (
+          <div className="flex justify-center items-center mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center space-x-2">
+              <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm text-blue-700 dark:text-blue-300">
+                Daily Generations: {dailyGenerationRemaining} remaining (all features)
+              </span>
+            </div>
+          </div>
+        )}
+        
+        {/* Warning for limits */}
+        {!canCreateTranslation && (
+          <div className="flex items-center justify-center space-x-2 mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+            <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+            <span className="text-sm text-red-700 dark:text-red-300">
+              Daily generation limit reached. You can create {LIMITS.DAILY_GENERATION_LIMIT} items per day across all features.
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex-grow p-4 md:p-6 overflow-y-auto space-y-6">
@@ -166,7 +227,7 @@ const TranslatorContent: React.FC = () => {
               </button>
             </div>
         ) : (
-          <button onClick={handleTranslate} disabled={inputContent.length < 50 || isTranslating} className="w-full bg-purple-600 text-white font-['SF-Pro-Display-Regular'] py-3 rounded-lg flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+          <button onClick={handleTranslate} disabled={inputContent.length < 50 || isTranslating || !canCreateTranslation} className="w-full bg-purple-600 text-white font-['SF-Pro-Display-Regular'] py-3 rounded-lg flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
             {isTranslating ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Zap className="w-5 h-5" />}
             <span>{isTranslating ? 'Translating...' : 'Translate Content'}</span>
           </button>

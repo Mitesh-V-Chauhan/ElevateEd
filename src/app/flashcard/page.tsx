@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, Suspense, useCallback } from 'react';
-import { Layers, Download } from 'lucide-react';
+import React, { useState, Suspense, useCallback, useEffect } from 'react';
+import { Layers, Download, AlertTriangle, Zap } from 'lucide-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import InteractiveFlashcards from '@/components/InteractiveFlashcards';
 import { baseUrl } from '@/utils/urls';
@@ -9,6 +9,7 @@ import { saveFlashcardData } from '@/services/firebaseFunctions/post';
 import { useUniversalInput } from '@/contexts/InputContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { checkDailyGenerationLimit, updateDailyGenerationCount, LIMITS } from '@/services/firebaseFunctions/limits';
 
 // Updated interface for flashcard data
 export interface Flashcard {
@@ -34,12 +35,51 @@ const FlashcardGeneratorContent: React.FC = () => {
   const [flashcardTitle, setFlashcardTitle] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  
+  // Limit tracking states
+  const [dailyGenerationRemaining, setDailyGenerationRemaining] = useState<number>(LIMITS.DAILY_GENERATION_LIMIT);
+  const [canCreateFlashcard, setCanCreateFlashcard] = useState<boolean>(true);
+  const [isCheckingLimits, setIsCheckingLimits] = useState<boolean>(false);
+
+  // Check limits when component mounts and user changes
+  const checkLimits = useCallback(async () => {
+    if (!user) return;
+    
+    setIsCheckingLimits(true);
+    try {
+      const dailyGenerationLimit = await checkDailyGenerationLimit(user.id);
+      setDailyGenerationRemaining(dailyGenerationLimit.remaining);
+      setCanCreateFlashcard(dailyGenerationLimit.canGenerate);
+    } catch (error) {
+      console.error('Error checking limits:', error);
+      setCanCreateFlashcard(true); // Allow generation on error
+    } finally {
+      setIsCheckingLimits(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    checkLimits();
+  }, [checkLimits]);
 
   const handleGenerateFlashcards = async () => {
     if (!inputContent.trim() || inputContent.length < 100) {
       alert('Please provide at least 100 characters of content in the sidebar.');
       return;
     }
+
+    if (!user) {
+      alert('Please log in to generate flashcards.');
+      return;
+    }
+
+    // Check daily generation limit
+    const dailyGenerationLimit = await checkDailyGenerationLimit(user.id);
+    if (!dailyGenerationLimit.canGenerate) {
+      alert(`Daily generation limit reached! You can create ${LIMITS.DAILY_GENERATION_LIMIT} items per day across all features. Try again tomorrow.`);
+      return;
+    }
+
     setIsGenerating(true);
     setGeneratedFlashcards(null);
     setFlashcardTitle(null);
@@ -138,7 +178,13 @@ const FlashcardGeneratorContent: React.FC = () => {
         }
         
         // Save flashcard data to Firebase
-        if(user) await saveFlashcardData(user.id, flashcardData); 
+        if(user) {
+            await saveFlashcardData(user.id, flashcardData);
+            // Update daily generation count
+            await updateDailyGenerationCount(user.id, 'flashcard');
+            // Refresh limits
+            await checkLimits();
+        } 
     } catch (error) {
         console.error('Backend not available, using dummy data:', error);
         
@@ -174,7 +220,13 @@ const FlashcardGeneratorContent: React.FC = () => {
         setGeneratedFlashcards(dummyFlashcardData.flashcards || []);
         
         // Save dummy data to Firebase
-        if(user) await saveFlashcardData(user.id, dummyFlashcardData);
+        if(user) {
+            await saveFlashcardData(user.id, dummyFlashcardData);
+            // Update daily generation count
+            await updateDailyGenerationCount(user.id, 'flashcard');
+            // Refresh limits
+            await checkLimits();
+        }
     } finally {
         setIsGenerating(false);
     }
@@ -213,6 +265,28 @@ const FlashcardGeneratorContent: React.FC = () => {
         {/* Updated titles and text */}
         <h2 className={`text-xl font-semibold ${darkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>{flashcardTitle || 'Flashcard Generator'}</h2>
         <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Review your content with interactive flashcards.</p>
+        
+        {/* Limits Display */}
+        {!isCheckingLimits && (
+          <div className="flex justify-center items-center mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center space-x-2">
+              <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm text-blue-700 dark:text-blue-300">
+                Daily Generations: {dailyGenerationRemaining} remaining (all features)
+              </span>
+            </div>
+          </div>
+        )}
+        
+        {/* Warning for limits */}
+        {!canCreateFlashcard && (
+          <div className="flex items-center justify-center space-x-2 mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+            <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+            <span className="text-sm text-red-700 dark:text-red-300">
+              Daily generation limit reached. You can create {LIMITS.DAILY_GENERATION_LIMIT} items per day across all features.
+            </span>
+          </div>
+        )}
       </div>
       
       <div className="flex-grow relative flex items-center justify-center p-4" style={{ minHeight: 0 }}>
@@ -224,7 +298,7 @@ const FlashcardGeneratorContent: React.FC = () => {
           <div className={`absolute inset-0 flex flex-col items-center justify-center text-center ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
             <Layers className="w-16 h-16 mb-4" /> {/* Changed icon */}
             <h3 className={`text-lg font-semibold ${darkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>Your flashcards will appear here</h3>
-             <button onClick={handleGenerateFlashcards} disabled={inputContent.length < 100 || isGenerating} className="mt-6 bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:bg-purple-700">
+             <button onClick={handleGenerateFlashcards} disabled={inputContent.length < 100 || isGenerating || !canCreateFlashcard} className="mt-6 bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:bg-purple-700">
                 {isGenerating ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Layers className="w-5 h-5" />}
                 <span>{isGenerating ? 'Generating...' : 'Generate Flashcards'}</span>
             </button>
@@ -234,7 +308,7 @@ const FlashcardGeneratorContent: React.FC = () => {
       
       {generatedFlashcards && (
         <div className={`flex-shrink-0 p-4 border-t ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} flex gap-4`}>
-             <button onClick={handleGenerateFlashcards} disabled={isGenerating} className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg ${darkMode ? 'bg-zinc-700 hover:bg-zinc-600' : 'bg-zinc-200 hover:bg-zinc-300'} disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold`}>
+             <button onClick={handleGenerateFlashcards} disabled={isGenerating || !canCreateFlashcard} className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg ${darkMode ? 'bg-zinc-700 hover:bg-zinc-600' : 'bg-zinc-200 hover:bg-zinc-300'} disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold`}>
                 {isGenerating ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <Layers className="w-4 h-4" />}
                 <span>Regenerate</span>
             </button>

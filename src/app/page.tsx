@@ -35,19 +35,6 @@ export default function Page() {
               Powerful tools, intuitive design. <span className="exo-2-brand">ElevateEd</span> is the all-in-one platform for modern students and educators to simplify and accelerate learning.
             </p>
             
-            {/* Product Hunt Badge */}
-            <div className="flex justify-center mb-8 sm:mb-10 animate-fade-in-up-delay-2">
-              <a href="https://www.producthunt.com/products/elevateed-ai?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-elevateed&#0045;ai&#0045;adding&#0045;flowchart&#0045;gen" target="_blank" rel="noopener noreferrer">
-                <Image 
-                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1010140&theme=dark&t=1756323115693" 
-                  alt="ElevateEd&#0032;AI&#0032;&#0058;&#0032;Adding&#0032;Flowchart&#0032;Gen&#0046; - Transform&#0032;learning&#0032;with&#0032;quizzes&#0044;&#0032;flowcharts&#0032;and&#0032;summaries | Product Hunt" 
-                  width={250} 
-                  height={54}
-                  style={{width: '250px', height: '54px'}}
-                />
-              </a>
-            </div>
-            
             <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 animate-fade-in-up-delay-3">
               <Link 
                 href="/summariser"

@@ -14,7 +14,7 @@ import { updateQuiz } from '@/services/firebaseFunctions/update';
 import {  useRouter, useSearchParams } from 'next/navigation';
 import { getQuiz } from '@/services/firebaseFunctions/get';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { checkDailyQuizLimit, updateDailyQuizCount, checkQuizSubmissionLimit, LIMITS } from '@/services/firebaseFunctions/limits';
+import {checkQuizSubmissionLimit, checkDailyGenerationLimit, updateDailyGenerationCount, LIMITS } from '@/services/firebaseFunctions/limits';
 
 const QuizGeneratorContent: React.FC = () => {
   const params = useSearchParams().get('quizId') || '';
@@ -47,7 +47,7 @@ const QuizGeneratorContent: React.FC = () => {
   });
   
   // Limit tracking states
-  const [dailyQuizRemaining, setDailyQuizRemaining] = useState<number>(LIMITS.DAILY_QUIZ_LIMIT);
+  const [dailyGenerationRemaining, setDailyGenerationRemaining] = useState<number>(LIMITS.DAILY_GENERATION_LIMIT);
   const [canCreateQuiz, setCanCreateQuiz] = useState<boolean>(true);
   const [submissionRemaining, setSubmissionRemaining] = useState<number>(LIMITS.MAX_QUIZ_SUBMISSIONS);
   const [canSubmitQuiz, setCanSubmitQuiz] = useState<boolean>(true);
@@ -60,15 +60,16 @@ const QuizGeneratorContent: React.FC = () => {
   const darkMode = theme === 'dark';
   const router = useRouter();
 
-  // Function to check daily quiz limits
+  // Function to check daily generation limits
   const checkLimits = useCallback(async () => {
     if (!user) return;
     
     setIsCheckingLimits(true);
     try {
-      const dailyLimit = await checkDailyQuizLimit(user.id);
-      setDailyQuizRemaining(dailyLimit.remaining);
-      setCanCreateQuiz(dailyLimit.canCreate);
+      // Check universal generation limit
+      const dailyGenerationLimit = await checkDailyGenerationLimit(user.id);
+      setDailyGenerationRemaining(dailyGenerationLimit.remaining);
+      setCanCreateQuiz(dailyGenerationLimit.canGenerate);
       
       // If we have a quiz loaded, check submission limits
       if (quizId) {
@@ -276,10 +277,10 @@ const QuizGeneratorContent: React.FC = () => {
     return;
   }
 
-  // Check daily quiz limit
-  const dailyLimit = await checkDailyQuizLimit(user.id);
-  if (!dailyLimit.canCreate) {
-    alert(`Daily quiz limit reached! You can create ${LIMITS.DAILY_QUIZ_LIMIT} quizzes per day. Try again tomorrow.`);
+  // Check daily generation limit
+  const dailyGenerationLimit = await checkDailyGenerationLimit(user.id);
+  if (!dailyGenerationLimit.canGenerate) {
+    alert(`Daily generation limit reached! You can create ${LIMITS.DAILY_GENERATION_LIMIT} items per day across all features. Try again tomorrow.`);
     return;
   }
 
@@ -342,8 +343,8 @@ const QuizGeneratorContent: React.FC = () => {
         if(res.status == 200){
           setQuizId(res.id);
           console.log('Quiz created successfully, quizId:', res.id); // Debug log
-          // Update daily quiz count
-          await updateDailyQuizCount(userId);
+          // Update daily generation count
+          await updateDailyGenerationCount(userId, 'quiz');
           // Refresh limits
           await checkLimits();
           // Redirect to quiz page
@@ -629,7 +630,7 @@ ${isCorrect}
                   <div className="flex items-center space-x-2">
                     <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     <span className="text-sm text-blue-700 dark:text-blue-300">
-                      Daily Quizzes: {dailyQuizRemaining} remaining
+                      Daily Generations: {dailyGenerationRemaining} remaining (all features)
                     </span>
                   </div>
                 </div>
@@ -640,7 +641,7 @@ ${isCorrect}
                 <div className="flex items-center justify-center space-x-2 mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
                   <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
                   <span className="text-sm text-red-700 dark:text-red-300">
-                    Daily quiz limit reached. You can create {LIMITS.DAILY_QUIZ_LIMIT} quizzes per day.
+                    Daily generation limit reached. You can create {LIMITS.DAILY_GENERATION_LIMIT} items per day across all features.
                   </span>
                 </div>
               )}
