@@ -2,6 +2,7 @@
 
 import React, { useState, Suspense, useCallback } from 'react';
 import { Layers, Download } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import InteractiveFlashcards from '@/components/InteractiveFlashcards';
 import { baseUrl } from '@/utils/urls';
@@ -28,6 +29,7 @@ const FlashcardGeneratorContent: React.FC = () => {
   const { user } = useAuth();
   const { inputContent } = useUniversalInput(); // Get content from context
   const { theme } = useTheme();
+  const router = useRouter();
   const darkMode = theme === 'dark';
   
   const [generatedFlashcards, setGeneratedFlashcards] = useState<Flashcard[] | null>(null);
@@ -137,8 +139,15 @@ const FlashcardGeneratorContent: React.FC = () => {
             }
         }
         
-        // Save flashcard data to Firebase
-        if(user) await saveFlashcardData(user.id, flashcardData); 
+        // Save flashcard data to Firebase and redirect to view page
+        if(user) {
+            const saveResult = await saveFlashcardData(user.id, flashcardData);
+            if (saveResult.status === 200 && saveResult.id) {
+                // Redirect to the view page with the generated ID
+                router.push(`/flashcard/view/${saveResult.id}`);
+                return; // Exit early since we're redirecting
+            }
+        } 
     } catch (error) {
         console.error('Backend not available, using dummy data:', error);
         
@@ -173,8 +182,15 @@ const FlashcardGeneratorContent: React.FC = () => {
         setFlashcardTitle(dummyFlashcardData.title);
         setGeneratedFlashcards(dummyFlashcardData.flashcards || []);
         
-        // Save dummy data to Firebase
-        if(user) await saveFlashcardData(user.id, dummyFlashcardData);
+        // Save dummy data to Firebase and redirect to view page
+        if(user) {
+            const saveResult = await saveFlashcardData(user.id, dummyFlashcardData);
+            if (saveResult.status === 200 && saveResult.id) {
+                // Redirect to the view page with the generated ID
+                router.push(`/flashcard/view/${saveResult.id}`);
+                return; // Exit early since we're redirecting
+            }
+        }
     } finally {
         setIsGenerating(false);
     }

@@ -2,6 +2,7 @@
 
 import React, { useState, Suspense, useCallback } from 'react';
 import { Spline, Download } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import InteractiveFlowchart from '@/components/InteractiveFlowchart';
 import { baseUrl } from '@/utils/urls';
@@ -21,6 +22,7 @@ export interface FlowchartResponse {
 const FlowchartGeneratorContent: React.FC = () => {
   const { user } = useAuth();
   const { inputContent, selectedLanguage } = useUniversalInput(); // Get content and language from context
+  const router = useRouter();
   
   const [generatedFlowchart, setGeneratedFlowchart] = useState<FlowchartResponse['flowchart'] | null>(null);
   const [flowchartTitle, setFlowchartTitle] = useState<string | null>(null);
@@ -58,7 +60,16 @@ const FlowchartGeneratorContent: React.FC = () => {
         const flowChartData: FlowchartResponse = await response.json();
         setFlowchartTitle(flowChartData.title);
         setGeneratedFlowchart(flowChartData.flowchart);
-        if(user) await saveFlowChartData(user.id, flowChartData);
+        
+        // Save to Firebase and redirect to view page
+        if(user) {
+            const saveResult = await saveFlowChartData(user.id, flowChartData);
+            if (saveResult.status === 200 && saveResult.id) {
+                // Redirect to the view page with the generated ID
+                router.push(`/flowchart/view/${saveResult.id}`);
+                return; // Exit early since we're redirecting
+            }
+        }
     } catch (error) {
         console.error('Error generating flowchart:', error);
         alert(error instanceof Error ? error.message : 'An unknown error occurred.');
