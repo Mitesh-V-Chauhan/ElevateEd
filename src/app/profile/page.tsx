@@ -109,6 +109,7 @@ const Profile: React.FC = () => {
 
   const getAverageScoreOfQuizzes = () => {
     let total: number = 0;
+    if(recentQuizzes.length === 0) return 0;
     for(const quiz of recentQuizzes){
       if(quiz.total_submissions !== 0) total += getAverageScoreOfQuiz(quiz);
     }

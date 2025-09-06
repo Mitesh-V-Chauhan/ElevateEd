@@ -124,7 +124,7 @@ export default function Header() {
               About
             </ProtectedLink>
             {user && (
-              <ProtectedLink href="/history" className={`font-['SF-Pro-Display-Regular'] text-sm transition-all duration-300 hover:text-purple-500 ${isQuizInProgress ? 'opacity-50 cursor-not-allowed' : ''} ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-600 hover:text-zinc-900'}`}>
+              <ProtectedLink href="/profile" className={`font-['SF-Pro-Display-Regular'] text-sm transition-all duration-300 hover:text-purple-500 ${isQuizInProgress ? 'opacity-50 cursor-not-allowed' : ''} ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-600 hover:text-zinc-900'}`}>
                 History
               </ProtectedLink>
             )}
