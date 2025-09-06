@@ -1,0 +1,1 @@
+export const baseUrl = "https://codeed-backend-hu8z.onrender.com";
