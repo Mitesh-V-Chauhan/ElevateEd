@@ -89,7 +89,7 @@ const SummarizerContent: React.FC = () => {
       setGeneratedSummary(data.summary);
       
       // Update daily generation count
-      await updateDailyGenerationCount(user.id, 'summary');
+      await updateDailyGenerationCount(user.id);
       await checkUserLimits();
     } catch (error) {
       console.error('Error generating summary:', error);

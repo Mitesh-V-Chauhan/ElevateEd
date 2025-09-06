@@ -51,7 +51,7 @@ export async function checkDailyGenerationLimit(userId: string): Promise<{ canGe
   }
 }
 
-export async function updateDailyGenerationCount(userId: string, generationType: 'quiz' | 'summary' | 'flashcard' | 'flowchart' | 'translation'): Promise<boolean> {
+export async function updateDailyGenerationCount(userId: string): Promise<boolean> {
   try {
     const userDoc = await getDoc(doc(db, 'users', userId));
     if (!userDoc.exists()) {
@@ -92,7 +92,7 @@ export async function checkDailyQuizLimit(userId: string): Promise<{ canCreate: 
 
 // Backward compatibility function for quiz count updating
 export async function updateDailyQuizCount(userId: string): Promise<boolean> {
-  return await updateDailyGenerationCount(userId, 'quiz');
+  return await updateDailyGenerationCount(userId);
 }
 
 export async function checkQuizSubmissionLimit(userId: string, quizId: string): Promise<{ canSubmit: boolean; remaining: number; currentSubmissions: number }> {

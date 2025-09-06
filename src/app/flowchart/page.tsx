@@ -2,13 +2,13 @@
 
 import React, { useState, Suspense, useCallback, useEffect } from 'react';
 import { Spline, Download, AlertTriangle, Zap } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import InteractiveFlowchart from '@/components/InteractiveFlowchart';
 import { baseUrl } from '@/utils/urls';
 import { saveFlowChartData } from '@/services/firebaseFunctions/post';
 import { useUniversalInput } from '@/contexts/InputContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/contexts/ThemeContext';
 import { checkDailyGenerationLimit, updateDailyGenerationCount, LIMITS } from '@/services/firebaseFunctions/limits';
 
 export interface FlowchartResponse {
@@ -23,8 +23,7 @@ export interface FlowchartResponse {
 const FlowchartGeneratorContent: React.FC = () => {
   const { user } = useAuth();
   const { inputContent, selectedLanguage } = useUniversalInput(); // Get content and language from context
-  const { theme } = useTheme();
-  const darkMode = theme === 'dark';
+  const router = useRouter();
   
   const [generatedFlowchart, setGeneratedFlowchart] = useState<FlowchartResponse['flowchart'] | null>(null);
   const [flowchartTitle, setFlowchartTitle] = useState<string | null>(null);
@@ -103,11 +102,16 @@ const FlowchartGeneratorContent: React.FC = () => {
         setGeneratedFlowchart(flowChartData.flowchart);
         
         if(user) {
-            await saveFlowChartData(user.id, flowChartData);
+            const saveResult = await saveFlowChartData(user.id, flowChartData);
             // Update daily generation count
-            await updateDailyGenerationCount(user.id, 'flowchart');
+            await updateDailyGenerationCount(user.id);
             // Refresh limits
             await checkLimits();
+            if (saveResult.status === 200 && saveResult.id) {
+                // Redirect to the view page with the generated ID
+                router.push(`/flowchart/view/${saveResult.id}`);
+                return; // Exit early since we're redirecting
+            }
         }
     } catch (error) {
         console.error('Error generating flowchart:', error);

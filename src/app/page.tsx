@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Brain, Zap, FileText, CheckCircle, ArrowRight, BookOpen, FlaskConical, Spline, Languages, CreditCard } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import Header from '@/components/GeneratorHeader'

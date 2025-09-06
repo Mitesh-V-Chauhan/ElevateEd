@@ -126,7 +126,7 @@ const TranslatorContent: React.FC = () => {
       setTranslatedContent(data.translated_text || data.translation || data.result);
       
       // Update daily generation count
-      await updateDailyGenerationCount(user.id, 'translation');
+      await updateDailyGenerationCount(user.id);
       await checkLimits();
     } catch (error) {
       console.error('Error translating content:', error);

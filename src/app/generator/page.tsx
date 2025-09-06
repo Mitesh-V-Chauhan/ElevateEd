@@ -344,7 +344,7 @@ const QuizGeneratorContent: React.FC = () => {
           setQuizId(res.id);
           console.log('Quiz created successfully, quizId:', res.id); // Debug log
           // Update daily generation count
-          await updateDailyGenerationCount(userId, 'quiz');
+          await updateDailyGenerationCount(userId);
           // Refresh limits
           await checkLimits();
           // Redirect to quiz page
