@@ -407,7 +407,8 @@ A: Clear browser cache and ensure Tailwind CSS is properly configured.
 
 ### Core Contributors
 
-- **[Mitesh V. Chauhan](https://github.com/Mitesh-V-Chauhan)** - Lead Developer & Project Maintainer
+- **[Mitesh V. Chauhan](https://github.com/Mitesh-V-Chauhan)** - Co-Lead Developer & Project Co-Founder
+- **[Yuvraj Rathod](https://github.com/YuvrajRathod)** - Co-Lead Developer & Project Co-Founder
 
 ### Acknowledgments
 
