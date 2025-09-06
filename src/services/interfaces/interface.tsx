@@ -59,8 +59,8 @@ export interface userData {
     email: string,
     joined: Date,
     quizes: QuizSummary[], // Changed to use QuizSummary instead of full Quiz
-    dailyQuizCount?: number,
-    lastQuizDate?: Date | Timestamp,
+    dailyGenerationCount?: number, // Universal field for all daily generations
+    lastGenerationDate?: Date | Timestamp, // Universal field for last generation date
     onboarding_completed?: boolean,
     location?: string,
     hearAboutUs?: string,

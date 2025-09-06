@@ -2,42 +2,56 @@ import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { userData } from '../interfaces/interface';
 
-const DAILY_QUIZ_LIMIT = 5;
+const DAILY_GENERATION_LIMIT = 10; // Total daily limit for all generations
 const MAX_QUIZ_SUBMISSIONS = 5;
 
-export async function checkDailyQuizLimit(userId: string): Promise<{ canCreate: boolean; remaining: number }> {
+// Helper function to get today's date string in consistent format
+function getTodayDateString(): string {
+  const now = new Date();
+  // Reset at midnight local time
+  now.setHours(0, 0, 0, 0);
+  return now.toISOString().split('T')[0]; // YYYY-MM-DD format
+}
+
+// Helper function to check if it's a new day
+function isNewDay(lastDate: Date | Timestamp | null): boolean {
+  if (!lastDate) return true;
+  
+  const lastDateString = lastDate instanceof Timestamp ? 
+    lastDate.toDate().toISOString().split('T')[0] : 
+    new Date(lastDate).toISOString().split('T')[0];
+  
+  return lastDateString !== getTodayDateString();
+}
+
+export async function checkDailyGenerationLimit(userId: string): Promise<{ canGenerate: boolean; remaining: number }> {
   try {
     const userDoc = await getDoc(doc(db, 'users', userId));
     if (!userDoc.exists()) {
-      return { canCreate: false, remaining: 0 };
+      return { canGenerate: false, remaining: 0 };
     }
     
     const userData = userDoc.data() as userData;
-    const today = new Date().toDateString();
-    const lastQuizDate = userData.lastQuizDate ? 
-      (userData.lastQuizDate instanceof Timestamp ? 
-        userData.lastQuizDate.toDate().toDateString() : 
-        new Date(userData.lastQuizDate).toDateString()) : null;
     
-    // If it's a new day, reset the count
-    if (lastQuizDate !== today) {
-      return { canCreate: true, remaining: DAILY_QUIZ_LIMIT };
+    // Check if it's a new day
+    if (isNewDay(userData.lastGenerationDate || null)) {
+      return { canGenerate: true, remaining: DAILY_GENERATION_LIMIT };
     }
     
-    const currentCount = userData.dailyQuizCount || 0;
-    const remaining = Math.max(0, DAILY_QUIZ_LIMIT - currentCount);
+    const currentCount = userData.dailyGenerationCount || 0;
+    const remaining = Math.max(0, DAILY_GENERATION_LIMIT - currentCount);
     
     return {
-      canCreate: currentCount < DAILY_QUIZ_LIMIT,
+      canGenerate: currentCount < DAILY_GENERATION_LIMIT,
       remaining: remaining
     };
   } catch (error) {
-    console.error('Error checking daily quiz limit:', error);
-    return { canCreate: false, remaining: 0 };
+    console.error('Error checking daily generation limit:', error);
+    return { canGenerate: false, remaining: 0 };
   }
 }
 
-export async function updateDailyQuizCount(userId: string): Promise<boolean> {
+export async function updateDailyGenerationCount(userId: string, generationType: 'quiz' | 'summary' | 'flashcard' | 'flowchart' | 'translation'): Promise<boolean> {
   try {
     const userDoc = await getDoc(doc(db, 'users', userId));
     if (!userDoc.exists()) {
@@ -46,29 +60,39 @@ export async function updateDailyQuizCount(userId: string): Promise<boolean> {
     
     const userData = userDoc.data() as userData;
     const today = new Date();
-    const todayString = today.toDateString();
-    const lastQuizDate = userData.lastQuizDate ? 
-      (userData.lastQuizDate instanceof Timestamp ? 
-        userData.lastQuizDate.toDate().toDateString() : 
-        new Date(userData.lastQuizDate).toDateString()) : null;
     
     let newCount = 1;
     
     // If it's the same day, increment the count
-    if (lastQuizDate === todayString) {
-      newCount = (userData.dailyQuizCount || 0) + 1;
+    if (!isNewDay(userData.lastGenerationDate || null)) {
+      newCount = (userData.dailyGenerationCount || 0) + 1;
     }
     
     await updateDoc(doc(db, 'users', userId), {
-      dailyQuizCount: newCount,
-      lastQuizDate: today
+      dailyGenerationCount: newCount,
+      lastGenerationDate: today
     });
     
     return true;
   } catch (error) {
-    console.error('Error updating daily quiz count:', error);
+    console.error('Error updating daily generation count:', error);
     return false;
   }
+}
+
+// Backward compatibility function for quiz-specific limit checking
+// Now uses the universal generation limit instead of a separate quiz limit
+export async function checkDailyQuizLimit(userId: string): Promise<{ canCreate: boolean; remaining: number }> {
+  const result = await checkDailyGenerationLimit(userId);
+  return {
+    canCreate: result.canGenerate,
+    remaining: result.remaining
+  };
+}
+
+// Backward compatibility function for quiz count updating
+export async function updateDailyQuizCount(userId: string): Promise<boolean> {
+  return await updateDailyGenerationCount(userId, 'quiz');
 }
 
 export async function checkQuizSubmissionLimit(userId: string, quizId: string): Promise<{ canSubmit: boolean; remaining: number; currentSubmissions: number }> {
@@ -94,6 +118,6 @@ export async function checkQuizSubmissionLimit(userId: string, quizId: string): 
 }
 
 export const LIMITS = {
-  DAILY_QUIZ_LIMIT,
+  DAILY_GENERATION_LIMIT,
   MAX_QUIZ_SUBMISSIONS
 };
