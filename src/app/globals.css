@@ -4,8 +4,9 @@
 
 /* Custom font classes */
 .exo-2-brand {
-  font-family: "Asimovian", sans-serif;
-  font-weight: 400;
+  font-family: "Exo 2", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
   font-style: normal;
 }
 
