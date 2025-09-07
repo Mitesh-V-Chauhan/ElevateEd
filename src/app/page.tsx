@@ -245,7 +245,7 @@ export default function Page() {
                 <p className={`font-['SF-Pro-Display-Regular'] text-lg sm:text-xl lg:text-2xl leading-relaxed mb-8 ${darkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
                   We believe that powerful learning tools should be accessible to everyone. Our mission is to transform how people learn by making advanced AI-powered educational tools simple, intuitive, and available to students, educators, and lifelong learners worldwide.
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-12">
+                {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-12">
                   <div className="text-center">
                     <div className={`text-3xl sm:text-4xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>50K+</div>
                     <div className={`text-sm sm:text-base ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>Active Learners</div>
@@ -258,7 +258,7 @@ export default function Page() {
                     <div className={`text-3xl sm:text-4xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>5</div>
                     <div className={`text-sm sm:text-base ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>AI-Powered Tools</div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
