@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useTheme } from '@/contexts/ThemeContext';
 import Header from '@/components/GeneratorHeader'
 import Footer from '@/components/Footer';
-import { ChevronDown, ChevronUp, Play, Upload, Brain, Zap, FileText, HelpCircle, MessageCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Play, Upload, Brain, Zap, FileText, HelpCircle } from 'lucide-react';
 
 const HelpPage: React.FC = () => {
   const { theme } = useTheme();

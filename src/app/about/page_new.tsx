@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Brain, Users, Target, Mail, Github, Linkedin } from 'lucide-react';
+import { Brain, Users, Target, } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import Header from '@/components/GeneratorHeader'
 import Footer from '@/components/Footer';
