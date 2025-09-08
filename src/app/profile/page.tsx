@@ -508,6 +508,10 @@ const Profile: React.FC = () => {
                                 ? new Date(flashcard.generatedAt.seconds * 1000).toLocaleDateString()
                                 : 'Unknown date'}
                             </span>
+                            <span className="flex items-center space-x-1 text-sm text-zinc-500">
+                              <BookOpen className="w-3 h-3" />
+                              <span>{flashcard?.flashcards?.length} cards</span>
+                            </span>
                           </div>
                         </div>
                         <div className={`text-sm ${darkMode ? 'text-pink-400' : 'text-pink-600'} group-hover:translate-x-1 transition-transform`}>
