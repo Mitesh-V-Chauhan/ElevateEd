@@ -23,6 +23,13 @@ export default function Header() {
     }
   }
 
+  const handleOnClickProfile = () => {
+    setIsUserDropdownOpen(false)
+    if (typeof window !== 'undefined') {
+      window.location.href = '/profile'
+    }
+  }
+
   return (
     <header className={`border-b sticky top-0 z-50 transition-colors duration-300 ${darkMode ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-zinc-100'}`}>
       <div className="max-w-7xl mx-auto px-6 py-4">
@@ -81,15 +88,15 @@ export default function Header() {
                       <div className={`text-sm font-['SF-Pro-Display-Regular'] ${darkMode ? 'text-white' : 'text-zinc-900'}`}>{user?.username || 'User'}</div>
                       <div className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>{user?.email || 'user@example.com'}</div>
                     </div>
-                    <Link
-                      href="/profile"
+                    <button
+                      onClick={handleOnClickProfile}
                       className={`flex items-center space-x-2 px-4 py-2 transition-colors ${
                         darkMode ? 'text-zinc-300 hover:text-white hover:bg-zinc-700' : 'text-zinc-700 hover:text-zinc-900 hover:bg-zinc-50'
                       }`}
                     >
                       <User className="w-4 h-4" />
                       <span>Profile</span>
-                    </Link>
+                    </button>
                     <button
                       onClick={handleLogout}
                       className={`flex items-center space-x-2 w-full px-4 py-2 transition-colors text-left ${

@@ -365,8 +365,8 @@ const Profile: React.FC = () => {
               <div className="space-y-4">
                 {recentQuizzes.length > 0 ? (
                   recentQuizzes.map((quiz, index) => (
+                    <Link href={`/history/${quiz.id}`} key={index} className="block">
                     <div
-                      key={index}
                       className={`p-4 rounded-lg border ${darkMode ? 'bg-zinc-700/50 border-zinc-600' : 'bg-zinc-50 border-black'}  transition-shadow`}
                     >
                       <div className="flex items-center justify-between">
@@ -389,6 +389,7 @@ const Profile: React.FC = () => {
                         </div>
                       </div>
                     </div>
+                    </Link>
                   ))
                 ) : (
                   <div className="text-center py-8">
