@@ -94,6 +94,7 @@ const UniversalSidebar: React.FC<UniversalSidebarProps> = ({ isCollapsed, onTogg
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || 'Failed to extract content from file.');
       setInputContent(data.text || data.transcript || '');
+      setInputMethod('text'); // Switch to text input method to show extracted content
     } catch (error) {
       console.error('Error extracting content from file:', error);
       alert(error instanceof Error ? error.message : 'An unknown error occurred.');
@@ -124,6 +125,7 @@ const UniversalSidebar: React.FC<UniversalSidebarProps> = ({ isCollapsed, onTogg
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || 'Failed to extract text from website.');
       setInputContent(data.text || data.content || '');
+      setInputMethod('text'); // Switch to text input method to show extracted content
     } catch (error) {
       console.error('Error extracting text from website:', error);
       alert(error instanceof Error ? error.message : 'Failed to extract text from website.');
@@ -151,6 +153,7 @@ const UniversalSidebar: React.FC<UniversalSidebarProps> = ({ isCollapsed, onTogg
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || 'Failed to extract YouTube transcript.');
       setInputContent(data.transcript || data.text || '');
+      setInputMethod('text'); // Switch to text input method to show extracted content
     } catch (error) {
       console.error('Error extracting YouTube transcript:', error);
       alert(error instanceof Error ? error.message : 'Failed to extract YouTube transcript.');

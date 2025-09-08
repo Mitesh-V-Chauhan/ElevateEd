@@ -15,17 +15,15 @@ export const InputProvider = ({ children }: { children: ReactNode }) => {
   const [inputContent, setInputContentState] = useState<string>('');
   const [selectedLanguage, setSelectedLanguageState] = useState<string>('English');
 
-  // Load content and language from localStorage on mount
+  // Load content from localStorage on mount, but always default language to English
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedContent = localStorage.getItem('universalInputContent');
-      const savedLanguage = localStorage.getItem('universalInputLanguage');
       if (savedContent) {
         setInputContentState(savedContent);
       }
-      if (savedLanguage) {
-        setSelectedLanguageState(savedLanguage);
-      }
+      // Always default to English on page load, don't load saved language
+      setSelectedLanguageState('English');
     }
   }, []);
 

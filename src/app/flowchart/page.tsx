@@ -87,7 +87,7 @@ const FlowchartGeneratorContent: React.FC = () => {
             body: JSON.stringify({ 
                 text: inputContent,
                 userId: user?.id,
-                language: selectedLanguage,
+                language: selectedLanguage || 'English',
                 instructions: customInstructions.trim() || undefined
             }),
         });
