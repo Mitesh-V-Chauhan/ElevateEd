@@ -8,38 +8,65 @@ const MAX_QUIZ_SUBMISSIONS = 5;
 // Helper function to get today's date string in consistent format
 function getTodayDateString(): string {
   const now = new Date();
-  // Reset at midnight local time
-  now.setHours(0, 0, 0, 0);
-  return now.toISOString().split('T')[0]; // YYYY-MM-DD format
+  // Get local date in YYYY-MM-DD format without timezone conversion
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 // Helper function to check if it's a new day
 function isNewDay(lastDate: Date | Timestamp | null): boolean {
   if (!lastDate) return true;
   
-  const lastDateString = lastDate instanceof Timestamp ? 
-    lastDate.toDate().toISOString().split('T')[0] : 
-    new Date(lastDate).toISOString().split('T')[0];
+  // Convert Firestore timestamp or Date to local date string
+  let lastDateObj: Date;
+  if (lastDate instanceof Timestamp) {
+    lastDateObj = lastDate.toDate();
+  } else {
+    lastDateObj = new Date(lastDate);
+  }
   
-  return lastDateString !== getTodayDateString();
+  const lastYear = lastDateObj.getFullYear();
+  const lastMonth = String(lastDateObj.getMonth() + 1).padStart(2, '0');
+  const lastDay = String(lastDateObj.getDate()).padStart(2, '0');
+  const lastDateString = `${lastYear}-${lastMonth}-${lastDay}`;
+  
+  const todayString = getTodayDateString();
+  
+  console.log('Last generation date string:', lastDateString);
+  console.log('Today date string:', todayString);
+  console.log('Is new day?', lastDateString !== todayString);
+  
+  return lastDateString !== todayString;
 }
 
 export async function checkDailyGenerationLimit(userId: string): Promise<{ canGenerate: boolean; remaining: number }> {
   try {
+    console.log('checkDailyGenerationLimit called for userId:', userId);
     const userDoc = await getDoc(doc(db, 'users', userId));
     if (!userDoc.exists()) {
+      console.log('User document does not exist');
       return { canGenerate: false, remaining: 0 };
     }
     
     const userData = userDoc.data() as userData;
+    console.log('User data in check:', userData);
+    console.log('Daily generation count:', userData.dailyGenerationCount);
+    console.log('Last generation date:', userData.lastGenerationDate);
     
     // Check if it's a new day
     if (isNewDay(userData.lastGenerationDate || null)) {
+      console.log('It is a new day, allowing generation');
       return { canGenerate: true, remaining: DAILY_GENERATION_LIMIT };
     }
     
     const currentCount = userData.dailyGenerationCount || 0;
     const remaining = Math.max(0, DAILY_GENERATION_LIMIT - currentCount);
+    
+    console.log('Current count:', currentCount);
+    console.log('Remaining:', remaining);
+    console.log('Can generate:', currentCount < DAILY_GENERATION_LIMIT);
     
     return {
       canGenerate: currentCount < DAILY_GENERATION_LIMIT,
@@ -53,13 +80,19 @@ export async function checkDailyGenerationLimit(userId: string): Promise<{ canGe
 
 export async function updateDailyGenerationCount(userId: string): Promise<boolean> {
   try {
+    console.log('updateDailyGenerationCount called for userId:', userId);
     const userDoc = await getDoc(doc(db, 'users', userId));
     if (!userDoc.exists()) {
+      console.log('User document does not exist');
       return false;
     }
     
     const userData = userDoc.data() as userData;
     const today = new Date();
+    console.log('Current user data:', userData);
+    console.log('Today:', today);
+    console.log('Last generation date:', userData.lastGenerationDate);
+    console.log('Is new day?', isNewDay(userData.lastGenerationDate || null));
     
     let newCount = 1;
     
@@ -68,11 +101,14 @@ export async function updateDailyGenerationCount(userId: string): Promise<boolea
       newCount = (userData.dailyGenerationCount || 0) + 1;
     }
     
+    console.log('New count will be:', newCount);
+    
     await updateDoc(doc(db, 'users', userId), {
       dailyGenerationCount: newCount,
       lastGenerationDate: today
     });
     
+    console.log('Successfully updated user document');
     return true;
   } catch (error) {
     console.error('Error updating daily generation count:', error);

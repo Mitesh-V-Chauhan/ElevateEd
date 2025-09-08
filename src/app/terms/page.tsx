@@ -85,19 +85,6 @@ export default function Terms() {
                 In no event shall <span className="exo-2-brand">ElevateEd</span> or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use <span className="exo-2-brand">ElevateEd</span>, even if <span className="exo-2-brand">ElevateEd</span> or an authorized representative has been notified orally or in writing of the possibility of such damage.
               </p>
             </section>
-
-            <section className="mb-8">
-              <h2 className={`text-2xl font-['SF-Pro-Display-Regular'] mb-4 ${
-                darkMode ? 'text-white' : 'text-zinc-900'
-              }`}>
-                5. Contact Information
-              </h2>
-              <p className={`mb-4 ${
-                darkMode ? 'text-zinc-300' : 'text-zinc-600'
-              }`}>
-                If you have any questions about these Terms of Service, please contact us at support@elevateed-ai.com
-              </p>
-            </section>
           </div>
         </div>
       </div>

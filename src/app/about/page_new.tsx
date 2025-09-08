@@ -160,43 +160,6 @@ export default function About() {
             <p className={`text-base sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto px-2 ${darkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
               Have questions, feedback, or want to partner with us? We&apos;d love to hear from you!
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
-              <a 
-                href="mailto:contact@elevateed.ai"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-['SF-Pro-Display-Regular'] hover:shadow-lg transform  transition-all text-sm sm:text-base"
-              >
-                <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>Contact Us</span>
-              </a>
-              <div className="flex space-x-3 sm:space-x-4">
-                <a 
-                  href="https://github.com/elevateed-ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-2 sm:p-3 rounded-lg border transition-all duration-300  ${
-                    darkMode 
-                      ? 'border-zinc-600 text-zinc-300 hover:bg-zinc-700' 
-                      : 'border-zinc-300 text-zinc-600 hover:bg-zinc-50'
-                  }`}
-                  aria-label="GitHub"
-                >
-                  <Github className="w-4 h-4 sm:w-5 sm:h-5" />
-                </a>
-                <a 
-                  href="https://linkedin.com/company/elevateed-ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-2 sm:p-3 rounded-lg border transition-all duration-300  ${
-                    darkMode 
-                      ? 'border-zinc-600 text-zinc-300 hover:bg-zinc-700' 
-                      : 'border-zinc-300 text-zinc-600 hover:bg-zinc-50'
-                  }`}
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin className="w-4 h-4 sm:w-5 sm:h-5" />
-                </a>
-              </div>
-            </div>
           </div>
         </div>
 

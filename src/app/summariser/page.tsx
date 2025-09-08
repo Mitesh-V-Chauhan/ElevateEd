@@ -31,9 +31,11 @@ const SummarizerContent: React.FC = () => {
 
   const checkUserLimits = useCallback(async () => {
     if (!user) return;
+    console.log('Checking user limits for:', user.id);
     setIsCheckingLimits(true);
     try {
       const dailyGenerationLimit = await checkDailyGenerationLimit(user.id);
+      console.log('Daily generation limit result:', dailyGenerationLimit);
       setDailyGenerationRemaining(dailyGenerationLimit.remaining);
       setCanCreateSummary(dailyGenerationLimit.canGenerate);
     } catch (error) {
@@ -89,8 +91,14 @@ const SummarizerContent: React.FC = () => {
       setGeneratedSummary(data.summary);
       
       // Update daily generation count
-      await updateDailyGenerationCount(user.id);
+      console.log('Updating daily generation count for user:', user.id);
+      const updateResult = await updateDailyGenerationCount(user.id);
+      console.log('Update result:', updateResult);
+      
+      // Refresh limits to reflect the new count
+      console.log('Refreshing limits...');
       await checkUserLimits();
+      console.log('Limits refreshed');
     } catch (error) {
       console.error('Error generating summary:', error);
       alert(error instanceof Error ? error.message : 'An unknown error occurred.');
@@ -173,7 +181,7 @@ const SummarizerContent: React.FC = () => {
           {generatedSummary ? (
             <div className="prose prose-zinc dark:prose-invert max-w-none whitespace-pre-wrap text-base leading-relaxed">
               {summaryTitle && <h3 className="mb-4 text-2xl font-['SF-Pro-Display-Regular']">{summaryTitle}</h3>}
-              {Array.isArray(generatedSummary) ? (<ul>{generatedSummary.map((point, idx) => <li key={idx}>{point}</li>)}</ul>) : (<span>{generatedSummary}</span>)}
+              {Array.isArray(generatedSummary) ? (<ul className='list-disc list-inside'>{generatedSummary.map((point, idx) => <li className={idx%2 == 0 ? '' : 'text-gray-400'} key={idx}>{point}</li>)}</ul>) : (<span className='text-gray-400'>{generatedSummary}</span>)}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center text-zinc-400 dark:text-zinc-500">

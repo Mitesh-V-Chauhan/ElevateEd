@@ -124,19 +124,6 @@ export default function Privacy() {
                 You have the right to access, update, or delete your personal information. You may also opt out of certain communications from us.
               </p>
             </section>
-
-            <section className="mb-8">
-              <h2 className={`text-2xl font-['SF-Pro-Display-Regular'] mb-4 ${
-                darkMode ? 'text-white' : 'text-zinc-900'
-              }`}>
-                8. Contact Us
-              </h2>
-              <p className={`mb-4 ${
-                darkMode ? 'text-zinc-300' : 'text-zinc-600'
-              }`}>
-                If you have any questions about this Privacy Policy, please contact us at support@elevateed-ai.com
-              </p>
-            </section>
           </div>
         </div>
       </div>

@@ -67,7 +67,6 @@ export default function Cancellation() {
                 }`}>
                   <li>Log into your account and navigate to subscription settings</li>
                   <li>Click &quot;Cancel Subscription&quot; and follow the prompts</li>
-                  <li>Alternatively, email us at support@elevateed-ai.com with your cancellation request</li>
                 </ul>
               </section>
 
@@ -140,19 +139,6 @@ export default function Cancellation() {
                 <h3 className={`text-2xl font-['SF-Pro-Display-Regular'] mb-4 ${
                   darkMode ? 'text-white' : 'text-zinc-900'
                 }`}>
-                  3. How to Request a Refund
-                </h3>
-                <p className={`mb-4 ${
-                  darkMode ? 'text-zinc-300' : 'text-zinc-600'
-                }`}>
-                  To request a refund, email support@elevateed-ai.com with your account details and reason for the refund request. Include your subscription confirmation or order number for faster processing.
-                </p>
-              </section>
-
-              <section className="mb-8">
-                <h3 className={`text-2xl font-['SF-Pro-Display-Regular'] mb-4 ${
-                  darkMode ? 'text-white' : 'text-zinc-900'
-                }`}>
                   4. Processing Time
                 </h3>
                 <p className={`mb-4 ${
@@ -185,19 +171,6 @@ export default function Cancellation() {
                   darkMode ? 'text-zinc-300' : 'text-zinc-600'
                 }`}>
                   Your quiz history and generated content will be preserved for 30 days after refund processing. After this period, premium content may be archived or removed from your account.
-                </p>
-              </section>
-
-              <section className="mb-8">
-                <h3 className={`text-2xl font-['SF-Pro-Display-Regular'] mb-4 ${
-                  darkMode ? 'text-white' : 'text-zinc-900'
-                }`}>
-                  7. Contact Support
-                </h3>
-                <p className={`mb-4 ${
-                  darkMode ? 'text-zinc-300' : 'text-zinc-600'
-                }`}>
-                  For refund requests or questions about this policy, contact our support team at support@elevateed-ai.com. We&apos;re committed to ensuring customer satisfaction and will work with you to resolve any issues.
                 </p>
               </section>
             </div>
