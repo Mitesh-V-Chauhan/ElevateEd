@@ -307,8 +307,10 @@ const QuizGeneratorContent: React.FC = () => {
       }
 
       const data = await response.json();
+      if(process.env.NODE_ENV === 'development'){
       console.log('API Response:', data); // Debug log
       console.log('Questions in response:', data.questions); // Debug log
+      }
       
       setCurrentQuestion(0);
       setUserAnswers({});
@@ -328,7 +330,9 @@ const QuizGeneratorContent: React.FC = () => {
         total_submissions: 0
       }
       
+      if(process.env.NODE_ENV === 'development'){
       console.log('Quiz object created:', quizObj); // Debug log
+      }
 
       // Validate quiz has questions before proceeding
       if (!quizObj.questions || quizObj.questions.length === 0) {
@@ -342,7 +346,9 @@ const QuizGeneratorContent: React.FC = () => {
         const res = await createQuiz(userId, quizObj);
         if(res.status == 200){
           setQuizId(res.id);
+          if(process.env.NODE_ENV === 'development'){
           console.log('Quiz created successfully, quizId:', res.id); // Debug log
+          }
           // Update daily generation count
           await updateDailyGenerationCount(userId);
           // Refresh limits

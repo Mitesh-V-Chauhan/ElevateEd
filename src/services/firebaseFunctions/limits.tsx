@@ -34,40 +34,50 @@ function isNewDay(lastDate: Date | Timestamp | null): boolean {
   
   const todayString = getTodayDateString();
   
+  if(process.env.NODE_ENV === 'development') {
   console.log('Last generation date string:', lastDateString);
   console.log('Today date string:', todayString);
   console.log('Is new day?', lastDateString !== todayString);
+  }
   
   return lastDateString !== todayString;
 }
 
 export async function checkDailyGenerationLimit(userId: string): Promise<{ canGenerate: boolean; remaining: number }> {
   try {
+    if(process.env.NODE_ENV === 'development') {
     console.log('checkDailyGenerationLimit called for userId:', userId);
+    }
     const userDoc = await getDoc(doc(db, 'users', userId));
     if (!userDoc.exists()) {
+      if(process.env.NODE_ENV === 'development') {
       console.log('User document does not exist');
+      }
       return { canGenerate: false, remaining: 0 };
     }
     
     const userData = userDoc.data() as userData;
+    if(process.env.NODE_ENV === 'development') {
     console.log('User data in check:', userData);
     console.log('Daily generation count:', userData.dailyGenerationCount);
     console.log('Last generation date:', userData.lastGenerationDate);
-    
+    }
     // Check if it's a new day
     if (isNewDay(userData.lastGenerationDate || null)) {
+      if(process.env.NODE_ENV === 'development') {
       console.log('It is a new day, allowing generation');
+      }
       return { canGenerate: true, remaining: DAILY_GENERATION_LIMIT };
     }
     
     const currentCount = userData.dailyGenerationCount || 0;
     const remaining = Math.max(0, DAILY_GENERATION_LIMIT - currentCount);
     
+    if(process.env.NODE_ENV === 'development') {
     console.log('Current count:', currentCount);
     console.log('Remaining:', remaining);
     console.log('Can generate:', currentCount < DAILY_GENERATION_LIMIT);
-    
+    }
     return {
       canGenerate: currentCount < DAILY_GENERATION_LIMIT,
       remaining: remaining
@@ -80,20 +90,25 @@ export async function checkDailyGenerationLimit(userId: string): Promise<{ canGe
 
 export async function updateDailyGenerationCount(userId: string): Promise<boolean> {
   try {
+    if(process.env.NODE_ENV === 'development') {
     console.log('updateDailyGenerationCount called for userId:', userId);
+    }
     const userDoc = await getDoc(doc(db, 'users', userId));
     if (!userDoc.exists()) {
+      if(process.env.NODE_ENV === 'development') {
       console.log('User document does not exist');
+      }
       return false;
     }
     
     const userData = userDoc.data() as userData;
     const today = new Date();
+    if(process.env.NODE_ENV === 'development') {
     console.log('Current user data:', userData);
     console.log('Today:', today);
     console.log('Last generation date:', userData.lastGenerationDate);
     console.log('Is new day?', isNewDay(userData.lastGenerationDate || null));
-    
+    }
     let newCount = 1;
     
     // If it's the same day, increment the count
@@ -101,14 +116,18 @@ export async function updateDailyGenerationCount(userId: string): Promise<boolea
       newCount = (userData.dailyGenerationCount || 0) + 1;
     }
     
+    if(process.env.NODE_ENV === 'development') {
     console.log('New count will be:', newCount);
+    }
     
     await updateDoc(doc(db, 'users', userId), {
       dailyGenerationCount: newCount,
       lastGenerationDate: today
     });
     
+    if(process.env.NODE_ENV === 'development') {
     console.log('Successfully updated user document');
+    }
     return true;
   } catch (error) {
     console.error('Error updating daily generation count:', error);

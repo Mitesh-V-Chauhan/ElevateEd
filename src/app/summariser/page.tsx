@@ -31,11 +31,15 @@ const SummarizerContent: React.FC = () => {
 
   const checkUserLimits = useCallback(async () => {
     if (!user) return;
+    if(process.env.NODE_ENV === 'development'){
     console.log('Checking user limits for:', user.id);
+    }
     setIsCheckingLimits(true);
     try {
       const dailyGenerationLimit = await checkDailyGenerationLimit(user.id);
+      if(process.env.NODE_ENV === 'development'){
       console.log('Daily generation limit result:', dailyGenerationLimit);
+      }
       setDailyGenerationRemaining(dailyGenerationLimit.remaining);
       setCanCreateSummary(dailyGenerationLimit.canGenerate);
     } catch (error) {
@@ -91,14 +95,22 @@ const SummarizerContent: React.FC = () => {
       setGeneratedSummary(data.summary);
       
       // Update daily generation count
+      if(process.env.NODE_ENV === 'development'){
       console.log('Updating daily generation count for user:', user.id);
+      }
       const updateResult = await updateDailyGenerationCount(user.id);
+      if(process.env.NODE_ENV === 'development'){
       console.log('Update result:', updateResult);
+      }
       
       // Refresh limits to reflect the new count
+      if(process.env.NODE_ENV === 'development'){
       console.log('Refreshing limits...');
+      }
       await checkUserLimits();
+      if(process.env.NODE_ENV === 'development'){
       console.log('Limits refreshed');
+      }
     } catch (error) {
       console.error('Error generating summary:', error);
       alert(error instanceof Error ? error.message : 'An unknown error occurred.');

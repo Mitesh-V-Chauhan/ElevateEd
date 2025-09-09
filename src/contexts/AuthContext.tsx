@@ -41,9 +41,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Map Firebase user to custom User type
   const mapUser = async (firebaseUser: FirebaseUser): Promise<currentUser> => {
+    if(process.env.NODE_ENV === 'development') {
     console.log('MapUser - Fetching user data for:', firebaseUser.uid);
+    }
     const userData = await getUser(firebaseUser.uid);
+    if(process.env.NODE_ENV === 'development') {
     console.log('MapUser - Retrieved user data:', userData);
+    }
     const username = userData ? userData.username : firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '';
     const mappedUser = {
       id: firebaseUser.uid,
@@ -59,7 +63,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       subjectsOfInterest: userData?.subjectsOfInterest,
       onboarding_completed_at: userData?.onboarding_completed_at,
     }
+    if(process.env.NODE_ENV === 'development') {
     console.log('MapUser - Final mapped user:', mappedUser);
+    }
     return mappedUser;
   };
 
@@ -69,7 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Check if user document exists, create if it doesn't
         const existingUserData = await getUser(firebaseUser.uid);
         if (!existingUserData) {
+          if(process.env.NODE_ENV === 'development') {
           console.log('User document does not exist during auth state change, creating...');
+          }
           const newUserData = {
             id: firebaseUser.uid,
             username: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '',
@@ -108,7 +116,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check if user document exists, create if it doesn't
     const existingUserData = await getUser(user.uid);
     if (!existingUserData) {
+      if(process.env.NODE_ENV === 'development') {
       console.log('User document does not exist, creating...');
+      }
       const mappedUser = {
         id: user.uid,
         username: user.displayName || user.email?.split('@')[0] || '',
@@ -153,7 +163,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Check if user document exists, create if it doesn't
         const existingUserData = await getUser(firebaseUser.uid);
         if (!existingUserData) {
+          if(process.env.NODE_ENV === 'development') {
           console.log('User document does not exist, creating...');
+          }
           const mappedUser = {
             id: firebaseUser.uid,
             username: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '',
@@ -176,7 +188,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const sendPasswordReset = async (email: string) => {
     try {
       await sendPasswordResetEmail(auth, email);
-      console.log('Password reset email sent');
+      if(process.env.NODE_ENV === 'development') {
+        console.log('Password reset email sent');
+      }
     } catch (error) {
       console.error('Error sending password reset email:', error);
       throw error; // so that UI can show the message if needed
@@ -190,11 +204,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = async () => {
     if (auth.currentUser) {
+      if(process.env.NODE_ENV === 'development') {
       console.log('RefreshUser - Fetching fresh user data...');
+      }
       const mappedUser = await mapUser(auth.currentUser);
+      if(process.env.NODE_ENV === 'development') {
       console.log('RefreshUser - Fresh user data:', mappedUser);
+      }
       setUser(mappedUser);
+      if(process.env.NODE_ENV === 'development') {
       console.log('RefreshUser - User state updated');
+      
+      }
     }
   };
 

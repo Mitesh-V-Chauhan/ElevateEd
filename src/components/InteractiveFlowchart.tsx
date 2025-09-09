@@ -167,10 +167,14 @@ const FlowchartCanvas = ({ data, onDownload }: { data: FlowchartData; onDownload
 
   useEffect(() => {
     if (data?.flowchart) {
-      console.log('Flowchart data:', data.flowchart);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Flowchart data:', data.flowchart);
+      }
       const { initialNodes, initialEdges } = transformDataToFlowElements(data);
-      console.log('Generated nodes:', initialNodes);
-      console.log('Generated edges:', initialEdges);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Generated nodes:', initialNodes);
+        console.log('Generated edges:', initialEdges);
+      }
       setNodes(initialNodes);
       setEdges(initialEdges);
       setHasInitialized(false); // Reset when new data comes
@@ -189,7 +193,9 @@ const FlowchartCanvas = ({ data, onDownload }: { data: FlowchartData; onDownload
 
   const downloadFlowchart = useCallback(async () => {
     if (isDownloadInProgress) {
-      console.log('Download already in progress, skipping...');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Download already in progress, skipping...');
+      }
       return;
     }
     
@@ -343,7 +349,9 @@ const FlowchartCanvas = ({ data, onDownload }: { data: FlowchartData; onDownload
     if (onDownload && hasInitialized && nodes.length > 0) {
       // Create a wrapper that adds extra safety
       const safeDownload = () => {
+        if (process.env.NODE_ENV === 'development') {
         console.log('Download button clicked');
+        }
         downloadFlowchart();
       };
       onDownload(safeDownload);

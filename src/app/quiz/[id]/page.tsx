@@ -73,17 +73,23 @@ const QuizPage: React.FC = () => {
     };
 
     try {
+      if(process.env.NODE_ENV === 'development'){
       console.log('🔄 Submitting quiz...');
+      }
       const res = await submitQuiz(user.id, quizId as string, submission);
+      if(process.env.NODE_ENV === 'development'){
       console.log('📤 Submit response:', res);
+      }
       
       if(res.status !== 200) {
         alert('Failed to submit quiz. Please try again.');
         return;
       }
       
+      if(process.env.NODE_ENV === 'development'){
       console.log('🔍 Current quiz submissions:', quiz.submissions);
-      console.log('🆔 New submission ID:', res.id);
+      console.log('🆔 New submission ID:', res.id)
+      }
       
       const currentSubmissions = quiz.submissions || [];
       const updateData = { 
@@ -91,10 +97,15 @@ const QuizPage: React.FC = () => {
         total_submissions: (quiz.total_submissions || 0) + 1,
         list_score: [...(quiz.list_score || []), submission.score]
       };
+
+      if(process.env.NODE_ENV === 'development'){
       console.log('📝 Update data:', updateData);
+      }
       
       await updateQuiz(user.id, quizId as string, updateData);
-      console.log('✅ Quiz updated successfully');
+      if(process.env.NODE_ENV === 'development'){
+      console.log('✅ Quiz updated successfully')
+      }
       
       // Show feedback modal only for first-time attempts
       if ((quiz.total_submissions || 0) === 0) {

@@ -168,7 +168,9 @@ const Profile: React.FC = () => {
       setLoading(false);
     }catch (e){
       alert("Failed to update username");
+      if(process.env.NODE_ENV === 'development'){
       console.log(e);
+      }
     }
   };
 

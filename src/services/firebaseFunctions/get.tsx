@@ -4,22 +4,32 @@ import { Question, Quiz, QuizSubmissions, QuizSummary, userData, FlashcardData }
 import { FlowchartResponse } from "@/app/flowchart/page";
 
 export async function getUser(userId: string): Promise<userData | null> {
+  if(process.env.NODE_ENV === 'development') {
   console.log('GetUser - Fetching user data for userId:', userId);
+  }
   const userSnap = await getDoc(doc(db, 'users', userId));
   if (!userSnap.exists()) {
+    if(process.env.NODE_ENV === 'development') {
     console.log('GetUser - User document does not exist');
+    }
     return null;
   }
   const userData = userSnap.data() as userData;
+  if(process.env.NODE_ENV === 'development') {
   console.log('GetUser - Retrieved user data:', userData);
+  }
   return userData;
 }
 
 export async function getQuizzes(userId: string): Promise<Quiz[]> {
   try {
+    if(process.env.NODE_ENV === 'development') {
     console.log('🔍 Quiz collection path:', `users/${userId}/quizes`);
+    }
     const quizSnap = await getDocs(collection(db, 'users', userId, 'quizes'));
+    if(process.env.NODE_ENV === 'development') {
     console.log('🔍 Quiz collection size:', quizSnap.size);
+    }
     return quizSnap.docs.map(doc => ({id: doc.id, ...doc.data() } as Quiz));
   } catch (error) {
     console.error('❌ Error in getQuizzes:', error);
@@ -30,15 +40,21 @@ export async function getQuizzes(userId: string): Promise<Quiz[]> {
 // Alternative function to get quizzes from user document array
 export async function getQuizzesFromUserArray(userId: string): Promise<QuizSummary[]> {
   try {
+    if(process.env.NODE_ENV === 'development') {
     console.log('🔍 Getting quizzes from user document array');
+    }
     const userDoc = await getDoc(doc(db, 'users', userId));
     if (!userDoc.exists()) {
+      if(process.env.NODE_ENV === 'development') {
       console.log('❌ User document does not exist');
+      }
       return [];
     }
     const userData = userDoc.data();
     const quizzes = userData?.quizes || [];
+    if(process.env.NODE_ENV === 'development') {
     console.log('🔍 User document quizzes array size:', quizzes.length);
+    }
     return quizzes;
   } catch (error) {
     console.error('❌ Error in getQuizzesFromUserArray:', error);
@@ -81,12 +97,18 @@ export async function getFlowChartIds(userId: string): Promise<string[]> {
 
 export async function getFlowCharts(userId: string): Promise<FlowchartResponse[]> {
   try {
+    if(process.env.NODE_ENV === 'development') {
     console.log('🔍 Flowchart collection path:', `users/${userId}/flowcharts`);
+    }
     const flowchartsSnap = await getDocs(collection(db, 'users', userId, 'flowcharts'));
+    if(process.env.NODE_ENV === 'development') {
     console.log('🔍 Flowchart collection size:', flowchartsSnap.size);
     console.log('🔍 Flowchart collection empty?', flowchartsSnap.empty);
+    }
     const results = flowchartsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as FlowchartResponse));
+    if(process.env.NODE_ENV === 'development') {
     console.log('🔍 Mapped flowcharts:', results);
+    }
     return results;
   } catch (error: unknown) {
     console.error('❌ Error in getFlowCharts:', error);
@@ -116,11 +138,17 @@ export async function getFlashcard(userId: string, flashcardId: string): Promise
 
 export async function getFlashcards(userId: string): Promise<FlashcardData[]> {
   try {
+    if(process.env.NODE_ENV === 'development') {
     console.log('🔍 Flashcard collection path:', `users/${userId}/flashcards`);
+    }
     const flashcardsSnap = await getDocs(collection(db, 'users', userId, 'flashcards'));
+    if(process.env.NODE_ENV === 'development') {
     console.log('🔍 Flashcard collection size:', flashcardsSnap.size);
+    }
     const results = flashcardsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as FlashcardData));
+    if(process.env.NODE_ENV === 'development') {
     console.log('🔍 Mapped flashcards:', results);
+    }
     return results;
   } catch (error: unknown) {
     console.error('❌ Error in getFlashcards:', error);

@@ -41,7 +41,9 @@ const OnboardingPage: React.FC = () => {
 
     // If user has already completed onboarding, redirect to home
     if (user.onboarding_completed) {
+      if(process.env.NODE_ENV === 'development'){
       console.log('User has already completed onboarding, redirecting to home...');
+      }
       router.push('/home');
       return;
     }
@@ -204,18 +206,24 @@ const OnboardingPage: React.FC = () => {
         onboarding_completed_at: new Date().toISOString()
       };
 
+      if(process.env.NODE_ENV === 'development'){
       console.log('Updating user with onboarding data:', onboardingData);
+      }
       const result = await updateUser(user.id, onboardingData);
+      if(process.env.NODE_ENV === 'development'){
       console.log('Update result:', result);
       
+      
       console.log('User data updated, refreshing AuthContext...');
+      }
       // Refresh user data in AuthContext to reflect onboarding completion
       await refreshUser();
       
       // Add a small delay to ensure the refresh is complete
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      if(process.env.NODE_ENV === 'development'){
       console.log('AuthContext refreshed, redirecting to home...');
+      }
       // Now redirect to home
       router.push('/home');
     } catch (error) {

@@ -32,10 +32,12 @@ const from = () => ({ x: 0, rot: 0, scale: 1, y: -1000 });
 function Deck({ data, studyMode = 'sequential' }: { data: FlashcardData; studyMode?: 'sequential' | 'random' }) {
   const [gone] = useState(() => new Set());
   const [flipped, setFlipped] = useState<number[]>([]);
-  
-  console.log('Deck component - flashcards data:', data.flashcards);
-  console.log('Study mode:', studyMode);
-  
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Deck component - flashcards data:', data.flashcards);
+    console.log('Study mode:', studyMode);
+  }
+
   // Shuffle flashcards if random mode is selected
   const [shuffledFlashcards] = useState(() => {
     if (studyMode === 'random') {
@@ -110,11 +112,13 @@ function Deck({ data, studyMode = 'sequential' }: { data: FlashcardData; studyMo
             {props.map(({ x, rot }, i) => {
               if (i < currentCardIndex || i > currentCardIndex + 2) return null;
 
+              if (process.env.NODE_ENV === 'development') {
               console.log(`Card ${i}:`, {
                 question: displayData.flashcards[i]?.question,
                 answer: displayData.flashcards[i]?.answer,
                 isFlipped: flipped.includes(i)
               });
+            }
 
               return (
                 <animated.div
@@ -235,8 +239,10 @@ const InteractiveFlashcards = ({ data, flashcards, studyMode = 'sequential' }: I
         return <div className="text-center text-zinc-500">No flashcards to display.</div>;
     }
     
+    if (process.env.NODE_ENV === 'development') {
     console.log('InteractiveFlashcards flashcardData:', flashcardData);
     console.log('Flashcards:', flashcardData.flashcards);
+    }
     
     if (!flashcardData.flashcards || flashcardData.flashcards.length === 0) {
       return <div className="text-center text-zinc-500">No flashcards to display.</div>;

@@ -16,20 +16,26 @@ export function OnboardingCheck({ children }: { children: React.ReactNode }) {
     const skipRoutes = ['/auth', '/forgot_password', '/', '/about', '/features', '/privacy', '/terms', '/help', '/cancellation'];
     if (skipRoutes.includes(pathname)) return;
 
+    if (process.env.NODE_ENV === 'development') {
     console.log('OnboardingCheck - User data:', user);
     console.log('OnboardingCheck - Onboarding completed:', user.onboarding_completed);
     console.log('OnboardingCheck - Current pathname:', pathname);
+    }
     
     // If user is on onboarding page but has already completed it, redirect to home
     if (pathname === '/onboarding' && user.onboarding_completed) {
-      console.log('OnboardingCheck - User already completed onboarding, redirecting to home...');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('OnboardingCheck - User already completed onboarding, redirecting to home...');
+      }
       router.push('/home');
       return;
     }
     
     // If user hasn't completed onboarding and is not on onboarding page, redirect to onboarding
     if (!user.onboarding_completed && pathname !== '/onboarding') {
+      if (process.env.NODE_ENV === 'development') {
       console.log('OnboardingCheck - User has not completed onboarding, redirecting to onboarding...');
+      }
       router.push('/onboarding');
       return;
     }

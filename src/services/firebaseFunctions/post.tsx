@@ -6,13 +6,17 @@ import { FlashcardResponse } from '@/app/flashcard/page';
 
 export async function createUser(user: Omit<userData, 'quizes'>) {
   try {
-    console.log('CreateUser - Creating user document:', user);
+    if(process.env.NODE_ENV === 'development') {
+      console.log('CreateUser - Creating user document:', user);
+    }
     await setDoc(doc(db, 'users', user.id), {
       ...user,
       joined: user.joined instanceof Date ? Timestamp.fromDate(user.joined) : user.joined,
       quizes: [], // Initialize empty quizes array
     });
+    if(process.env.NODE_ENV === 'development') {
     console.log('CreateUser - User document created successfully');
+    }
     return {
       id: user.id,
       status: 200,
@@ -64,8 +68,9 @@ export async function createQuiz(
     await updateDoc(doc(db, 'users', userId), {
       quizes: arrayUnion(quizSummary)
     });
-    
+    if(process.env.NODE_ENV === 'development') {
     console.log('✅ Quiz created and summary added to user array:', quizRef.id);
+    }
     
     return {
       id: quizRef.id,

@@ -88,11 +88,13 @@ const FlashcardGeneratorContent: React.FC = () => {
     setFlashcardTitle(null);
 
     try {
+      if(process.env.NODE_ENV === 'development') {
         console.log('Sending to flashcard API:', { 
             text: inputContent.substring(0, 200) + '...', 
             textLength: inputContent.length,
             userId: user?.id 
         });
+      }
         
         // Updated API endpoint for flashcards
         const response = await fetch(`${baseUrl}/api/v1/flashcard`, {
@@ -109,14 +111,18 @@ const FlashcardGeneratorContent: React.FC = () => {
         }
 
         const flashcardData: FlashcardResponse = await response.json();
+        if(process.env.NODE_ENV === 'development') {
         console.log('Flashcard API Response:', flashcardData);
         console.log('Flashcard Data Type:', typeof flashcardData);
         console.log('Flashcard Data Keys:', Object.keys(flashcardData));
+        }
         
         // Check if the response has the expected structure
         if (flashcardData.flashcards && Array.isArray(flashcardData.flashcards)) {
+            if(process.env.NODE_ENV === 'development') {
             console.log('Flashcards array:', flashcardData.flashcards);
             console.log('First flashcard:', flashcardData.flashcards[0]);
+            }
             
             // Fix the typo in the API response (quetion -> question)
             const correctedFlashcards = flashcardData.flashcards.map((card: {question?: string; quetion?: string; answer?: string}) => ({
@@ -124,7 +130,9 @@ const FlashcardGeneratorContent: React.FC = () => {
                 answer: card.answer || 'No answer available'
             }));
             
+            if(process.env.NODE_ENV === 'development') {
             console.log('Corrected flashcards:', correctedFlashcards);
+            }
             
             // Check if the response is too generic and provide better fallback
             const isGenericResponse = correctedFlashcards.some((card: Flashcard) => 
