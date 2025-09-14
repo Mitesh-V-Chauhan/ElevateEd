@@ -25,6 +25,17 @@ const FlowchartGeneratorContent: React.FC = () => {
   const { inputContent, selectedLanguage } = useUniversalInput(); // Get content and language from context
   const router = useRouter();
   
+  // Force English if selectedLanguage is undefined, empty, or somehow set to Portuguese
+  const getSafeLanguage = () => {
+    if (!selectedLanguage || selectedLanguage === 'Portuguese') {
+      console.warn('Language was undefined or Portuguese, forcing to English');
+      return 'English';
+    }
+    return selectedLanguage;
+  };
+  
+  const safeLanguage = getSafeLanguage();
+  
   const [generatedFlowchart, setGeneratedFlowchart] = useState<FlowchartResponse['flowchart'] | null>(null);
   const [flowchartTitle, setFlowchartTitle] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -81,16 +92,28 @@ const FlowchartGeneratorContent: React.FC = () => {
     setFlowchartTitle(null);
 
     try {
+        
+      if(process.env.NODE_ENV === 'development'){
+        console.log('Generating flowchart with language:', safeLanguage); // Debug log
+      }
         const response = await fetch(`${baseUrl}/api/v1/flowchart`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 text: inputContent,
                 userId: user?.id,
-                language: selectedLanguage || 'English',
+                language: safeLanguage, // Use safeLanguage instead
                 instructions: customInstructions.trim() || undefined
             }),
         });
+        if(process.env.NODE_ENV === 'development'){
+        console.log('Request payload:', {
+            text: inputContent.substring(0, 100) + '...',
+            userId: user?.id,
+            language: safeLanguage, // Use safeLanguage instead
+            instructions: customInstructions.trim() || undefined
+        }); // Debug log
+      }
         
         if (!response.ok) {
             const errorData = await response.json();
@@ -216,7 +239,10 @@ const FlowchartGeneratorContent: React.FC = () => {
           <div className="space-y-2">
             <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Output Language</label>
             <div className="text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 p-2 rounded">
-              {selectedLanguage}
+              Selected: {safeLanguage} {/* Use safeLanguage */}
+            </div>
+            <div className="text-xs text-zinc-400 dark:text-zinc-500">
+              Debug: Context = "{selectedLanguage}", Safe = "{safeLanguage}"
             </div>
           </div>
         </div>
