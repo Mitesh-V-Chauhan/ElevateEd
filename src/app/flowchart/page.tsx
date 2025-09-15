@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, Suspense, useCallback, useEffect } from 'react';
-import { Spline, Download, AlertTriangle, Zap } from 'lucide-react';
+import { Spline, AlertTriangle, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import InteractiveFlowchart from '@/components/InteractiveFlowchart';
@@ -28,8 +28,6 @@ const FlowchartGeneratorContent: React.FC = () => {
   const [generatedFlowchart, setGeneratedFlowchart] = useState<FlowchartResponse['flowchart'] | null>(null);
   const [flowchartTitle, setFlowchartTitle] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [downloadFunction, setDownloadFunction] = useState<(() => void) | null>(null);
   const [customInstructions, setCustomInstructions] = useState<string>('');
   
   // Limit tracking states
@@ -121,13 +119,6 @@ const FlowchartGeneratorContent: React.FC = () => {
     }
   };
 
-  const handleDownload = useCallback(() => {
-    if (!downloadFunction || isDownloading) return;
-    setIsDownloading(true);
-    downloadFunction();
-    setTimeout(() => setIsDownloading(false), 3000);
-  }, [downloadFunction, isDownloading]);
-
   return (
     <div className="flex h-full bg-white dark:bg-zinc-900/50">
       {/* Main Content Area */}
@@ -163,7 +154,6 @@ const FlowchartGeneratorContent: React.FC = () => {
           {generatedFlowchart ? (
             <InteractiveFlowchart 
               data={{ title: flowchartTitle || 'Untitled', flowchart: generatedFlowchart }} 
-              onDownload={setDownloadFunction}
             />
           ) : (
             <div className="flex items-center justify-center h-full">
@@ -183,10 +173,6 @@ const FlowchartGeneratorContent: React.FC = () => {
             <button onClick={handleGenerateFlowchart} disabled={isGenerating || !canCreateFlowchart} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold">
               {isGenerating ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <Spline className="w-4 h-4" />}
               <span>Regenerate</span>
-            </button>
-            <button onClick={handleDownload} disabled={isDownloading || !downloadFunction} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold">
-              {isDownloading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Download className="w-4 h-4" />}
-              <span>{isDownloading ? 'Downloading...' : 'Download PNG'}</span>
             </button>
           </div>
         )}
