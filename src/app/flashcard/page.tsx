@@ -29,7 +29,7 @@ export interface FlashcardResponse {
 
 const FlashcardGeneratorContent: React.FC = () => {
   const { user } = useAuth();
-  const { inputContent } = useUniversalInput(); // Get content from context
+  const { inputContent, selectedLanguage } = useUniversalInput(); // Get content from context
   const { theme } = useTheme();
   const router = useRouter();
   const darkMode = theme === 'dark';
@@ -102,7 +102,8 @@ const FlashcardGeneratorContent: React.FC = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 text: inputContent,
-                userId: user?.id 
+                userId: user?.id,
+                language: selectedLanguage
             }),
         });
         
