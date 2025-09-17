@@ -242,7 +242,7 @@ const FlowchartGeneratorContent: React.FC = () => {
               Selected: {safeLanguage} {/* Use safeLanguage */}
             </div>
             <div className="text-xs text-zinc-400 dark:text-zinc-500">
-              Debug: Context = "{selectedLanguage}", Safe = "{safeLanguage}"
+              Debug: Context = &quot;{selectedLanguage}&quot;, Safe = &quot;{safeLanguage}&quot;
             </div>
           </div>
         </div>
