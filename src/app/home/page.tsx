@@ -115,6 +115,7 @@ const HeroSection: React.FC = () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.detail || 'Failed to extract content.');
             setInputContent(data.text || data.transcript || '');
+            setInputMethod('text');
         } catch (error) {
             console.error('Error extracting content from file:', error);
             alert(error instanceof Error ? error.message : 'An unknown error occurred.');
@@ -147,6 +148,7 @@ const HeroSection: React.FC = () => {
           const data = await response.json();
           if (!response.ok) throw new Error(data.detail || 'Failed to extract text from website.');
           setInputContent(data.text || data.content || '');
+          setInputMethod('text');
         } catch (error) {
           console.error('Error extracting text from website:', error);
           alert(error instanceof Error ? error.message : 'Failed to extract text from website.');
@@ -171,6 +173,7 @@ const HeroSection: React.FC = () => {
           const data = await response.json();
           if (!response.ok) throw new Error(data.detail || 'Failed to extract YouTube transcript.');
           setInputContent(data.transcript || data.text || '');
+          setInputMethod('text');
         } catch (error) {
           console.error('Error extracting YouTube transcript:', error);
           alert(error instanceof Error ? error.message : 'Failed to extract YouTube transcript.');
