@@ -180,7 +180,7 @@ const HeroSection: React.FC = () => {
     };
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center py-20 px-4">
+        <section className="relative min-h-screen flex items-center justify-center py-20 px-4 font-['SF-Pro-Display-Regular']">
              {/* Gradient Background Removed */}
             <div className="relative z-10 w-full max-w-4xl mx-auto">
                 <div className="text-center mb-10">
@@ -188,11 +188,11 @@ const HeroSection: React.FC = () => {
                       Elevate Your Learning
                     </h1>
                     <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                      Transform any content into quizzes, summaries, and flashcards with the power of AI.
+                      Transform any content into quizzes, summaries, flowcharts and flashcards into multiple languages with the power of AI.
                     </p>
                 </div>
 
-                <div className={`rounded-2xl border backdrop-blur-sm transition-all duration-300 shadow-xl ${
+                <div className={`rounded-2xl border border-pink-600 backdrop-blur-sm transition-all duration-300 shadow-xl font-['SF-Pro-Display-Regular'] ${
                   darkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/90 border-zinc-200'
                 }`}>
                     <div className="p-6">
@@ -344,33 +344,33 @@ const FeaturesSection: React.FC = () => {
     <section className={`py-24 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 font-['SF-Pro-Display-Regular']">
             A Tool for Every Need
           </h2>
-          <p className={`text-lg max-w-3xl mx-auto ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+          <p className={`text-lg max-w-3xl mx-auto font-['SF-Pro-Display-Regular'] ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             From quick summaries to in-depth quizzes, our AI suite is designed to integrate seamlessly into your workflow.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 font-['SF-Pro-Display-Regular']">
           {tools.map((tool) => {
             const Icon = tool.icon;
             return (
               <div 
                 key={tool.id}
-                className={`p-8 rounded-2xl border transition-all duration-300 transform hover:-translate-y-2 ${
+                className={`p-8 rounded-2xl font-['SF-Pro-Display-Regular'] border transition-all duration-300 transform hover:-translate-y-2 ${
                   darkMode ? 'bg-zinc-950 border-zinc-800 hover:border-purple-500' : 'bg-white border-zinc-200 hover:border-purple-500'
                 }`}
               >
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-6 bg-zinc-100 dark:bg-zinc-800`}>
+                <div className={`w-12 h-12  font-['SF-Pro-Display-Regular']rounded-lg flex items-center justify-center mb-6 bg-zinc-100 dark:bg-zinc-800`}>
                   <Icon className={`w-6 h-6 ${tool.color}`} />
                 </div>
                 
-                <h3 className="text-xl font-bold mb-3">
+                <h3 className="text-xl font-bold mb-3 font-['SF-Pro-Display-Regular']">
                   {tool.title}
                 </h3>
                 
-                <p className={`leading-relaxed ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                <p className={`leading-relaxed font-['SF-Pro-Display-Regular'] ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                   {tool.description}
                 </p>
               </div>
@@ -391,26 +391,26 @@ const HowItWorksSection: React.FC = () => {
 
   return (
     <section className="py-24">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl font-['SF-Pro-Display-Regular'] mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="text-4xl font-['SF-Pro-Display-Regular'] md:text-5xl font-bold mb-4">
             Learning, Simplified
           </h2>
-          <p className={`text-lg max-w-3xl mx-auto ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+          <p className={`text-lg font-['SF-Pro-Display-Regular'] max-w-3xl mx-auto ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Transform your materials into powerful learning aids in just three easy steps.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid font-['SF-Pro-Display-Regular'] grid-cols-1 md:grid-cols-3 gap-12">
           {howItWorksSteps.map((step, index) => (
             <div key={index} className="text-center flex flex-col items-center">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-purple-500 mb-6 border-2 ${darkMode ? 'bg-zinc-800 border-zinc-700' : 'bg-zinc-100 border-zinc-200'}`}>
+              <div className={`w-16 h-16 font-['SF-Pro-Display-Regular'] rounded-full flex items-center justify-center text-purple-500 mb-6 border-2 ${darkMode ? 'bg-zinc-800 border-zinc-700' : 'bg-zinc-100 border-zinc-200'}`}>
                 <step.icon className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold mb-3">
+              <h3 className="text-xl font-['SF-Pro-Display-Regular'] font-bold mb-3">
                 {step.title}
               </h3>
-              <p className={` ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+              <p className={` font-['SF-Pro-Display-Regular'] ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                 {step.description}
               </p>
             </div>
@@ -430,18 +430,18 @@ const CtaSection: React.FC = () => {
   const darkMode = theme === 'dark';
 
   return (
-    <section className={`py-24 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
+    <section className={` font-['SF-Pro-Display-Regular'] py-24 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
       <div className="max-w-4xl mx-auto px-4">
-        <div className={`rounded-2xl p-12 text-center border ${darkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+        <div className={` font-['SF-Pro-Display-Regular'] rounded-2xl p-12 text-center border ${darkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+          <h2 className=" font-['SF-Pro-Display-Regular'] text-4xl md:text-5xl font-bold mb-4">
             Ready to Elevate Your Learning?
           </h2>
-          <p className={`text-lg mb-8 max-w-2xl mx-auto ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+          <p className={` font-['SF-Pro-Display-Regular'] text-lg mb-8 max-w-2xl mx-auto ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Start for free and discover a smarter, more efficient way to study and comprehend new information.
           </p>
           <button 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 inline-flex items-center space-x-2 text-base shadow-lg hover:shadow-xl"
+            className=" font-['SF-Pro-Display-Regular'] bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 inline-flex items-center space-x-2 text-base shadow-lg hover:shadow-xl"
           >
             <span>Get Started Now</span>
             <ArrowRight className="w-5 h-5" />

@@ -366,7 +366,7 @@ export default function Page() {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
                   <Link 
-                    href="/summariser"
+                    href="/home"
                     className="bg-white text-blue-600 px-8 sm:px-10 py-4 sm:py-5 rounded-xl font-['SF-Pro-Display-Regular'] hover:bg-zinc-100 transition-all duration-300 transform hover:scale-105 inline-flex items-center space-x-3 text-base sm:text-lg shadow-lg hover:shadow-xl"
                   >
                     <span>Get Started for Free</span>

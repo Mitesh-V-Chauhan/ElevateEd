@@ -46,7 +46,7 @@ export default function Header() {
               </span>
             </div>
           ) : (
-            <ProtectedLink href={user ? "/home" : "/"} className="flex items-center space-x-3 group">
+            <ProtectedLink href={user ? "/" : "/"} className="flex items-center space-x-3 group">
               <h1 className="exo-2-brand text-[25px] bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent transition-all duration-300 group-hover:from-purple-700 group-hover:via-pink-700 group-hover:to-orange-600">
                 ElevateEd
               </h1>
