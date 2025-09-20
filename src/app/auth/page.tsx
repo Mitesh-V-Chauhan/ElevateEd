@@ -68,7 +68,7 @@ export default function SplitAuthPage() {
       } else {
         await login(formData.email, formData.password);
       }
-      window.location.href = '/generator';
+      window.location.href = '/home';
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred. Please try again.';
       console.error('Auth error:', errorMessage);
@@ -81,7 +81,7 @@ export default function SplitAuthPage() {
     setIsLoading(true);
     try {
       await googleLogin();
-      window.location.href = '/generator';
+      window.location.href = '/home';
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred during Google login. Please try again.';
       console.error('Google login error:', errorMessage);
